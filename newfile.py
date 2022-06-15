@@ -14,12 +14,13 @@ keyboard = VkKeyboard(one_time=True)
 
 
 
-vk_session = vk_api.VkApi(token='14266f5bed11e891829daf9d2655bfdeb2187b0a29c6a4ef01ae70e500c4a27c625abc71852315855bf28')##de944557a4f797e1ee8da074b0e76e044b9f76181990ebe689f9a0d110e44034b1345196302d01ffcdb8c
-longpoll = VkBotLongPoll(vk_session, group_id="202796234")##52451931")
+vk_session = vk_api.VkApi(token='token')
+longpoll = VkBotLongPoll(vk_session, group_id="202796234")
 vk = vk_session
 num = int
 msg_art = str
 avk=vk_session.get_api()
+##Далее описывается функционал отправки всякой хуйни и выгрузки фото (для последующей отправки)
 def sender(id, text):
     avk.messages.send(user_id = id, message = text, random_id = 0, keyboard = keyboard.get_keyboard())
 def send_attach(id, url):
@@ -41,13 +42,13 @@ def upload_photo(chat_id, filename):
     ownerId = photos[0]['owner_id']
     photoId = photos[0]['id']
     vk.method('messages.send', {'peer_id': chat_id, 'random_id': random.randint(0,2048), 'attachment': "photo{}_{}".format(ownerId, photoId)})
-while True: ##def handle(event):
+while True: ##цикл для лонгпола, без этой хуеты иногда вылетает ошиб_очка, а так на похуй
     try:
         for event in longpoll.listen():
             if event.type == VkBotEventType.MESSAGE_NEW:
                 print(event)
                 peer_id = event.message['peer_id']
-                if peer_id >= 2000000000:
+                if peer_id >= 2000000000: ##Если пир айди - это айди беседы, значит бот работает в режиме беседы с одним функционалом
                     if 'action' in event.message:
                         if (event.message['action']['type'] == 'chat_invite_user') and (event.message['action']['member_id'] == -202796234):
                             chat_id = int(event.chat_id)
@@ -61,8 +62,9 @@ while True: ##def handle(event):
                         ##if msg in ["/art", "/арт", "[club152451931|@random_anime_official], арт", "[club152451931|@random_anime_official], art", "[club152451931|@random_anime_official], /art", "[club152451931|@random_anime_official], /арт", "[club152451931|@random_anime_official] /art", "[club152451931|@random_anime_official] арт", "[club152451931|@random_anime_official] art", "[club152451931|@random_anime_official] /арт"]:
                            ## files = os.listdir("/home/qph7/Yuri pack")
                             ##upload_photo(peer_id, "/home/qph7/Yuri pack/"+files[random.randint(0, len(files)-1)])
+                            ##В этих строчках я пытался описать хуйню для добавления сразу нескольких картиночек в одно сообщение, но мне стало похуй
                         if msg in ["пчел"]:
-                            send_attach_chat(chat_id, "photo-202796234_457239018")
+                            send_attach_chat(chat_id, "photo-202796234_457239018") ##На основе вот этой команды предлагаю сделать команду на блок стикеров. Картинка выгружена в альбом паблика и отправляется просто url этой картинки, что даёт почти моментальный респонс
                         if msg in ["нацист"]:
                             send_attach_chat(chat_id, "video-29544671_171117427")
                         if msg in ["совок"]:
@@ -79,12 +81,12 @@ while True: ##def handle(event):
                         if msg in ["/gosl"]:
                             files = os.listdir("/home/qph7/Гуслинг")
                             upload_photo(peer_id, "/home/qph7/Гуслинг/"+files[random.randint(0, len(files)-1)])
-                else:     
+                else:     ##Если мы не находимся в беседе - функционал другой
                     msg = event.message['text'].lower()
                     id = event.message['from_id']
                     attachments = []
                     if msg in ["привет", "начать", "здравствуйте", "здравствуй", "ку", "хай", "прив", "дарова", "дороу", "привет.", "здравствуйте.", "здравствуй.", "ку.", "хай.", "прив.", "дарова.", "дороу.", "привет!", "здравствуйте!", "здравствуй!", "ку!", "хай!", "прив!", "дарова!", "дороу!"]:
-                        sender(id, "Вас приветствует бот-хуеглот")
+                        sender(id, "Вас приветствует бот")
                         send_stick(id, 21)
                     elif msg in ["арт", "art", "/art", "/арт", "/юри", "юри"]:
                         files = os.listdir("/home/qph7/Yuri pack")
@@ -105,10 +107,11 @@ while True: ##def handle(event):
                             #while num > 0:
                                 #send_attach(id, 'photo-152451931_'+str(randint(457248038, 457251894)))
                                 #num = num - 1
-                    elif msg in ["включить пк"] and ((id == 428225339) or (id == 245663694)):
+                    ##О, здесь я тоже пытался описать отправку нескольких картинок, можно поржать
+                    elif msg in ["включить пк"] and ((id == 428225339) or (id == 245663694)): ##Wake on LAN удобная штука
                         os.system("wakeonlan B4:2E:99:1B:EE:72")
                         sender(id, "Пк включен")
-                    elif msg in ["ip"] and ((id == 428225339) or (id == 245663694)):
+                    elif msg in ["ip"] and ((id == 428225339) or (id == 245663694)): ##А это мне лень было конфижить на роутере DHCP и поэтому я просто каждый раз обращался к боту чтобы он мне писал айпи локальный
                         result = subprocess.check_output("hostname -I", shell=True)
                         b = result[0:11]
                         print(b)
